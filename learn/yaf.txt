@@ -1,2 +1,12 @@
 YAF :
 c语言开发的php框架，效率极高，比php原生代码只有极小差别。
+
+
+
+        1
+
+        手册地址：http://yaf.laruence.com/manual/
+        2
+
+        源代码地址：http://code.google.com/p/yafphp/
+
