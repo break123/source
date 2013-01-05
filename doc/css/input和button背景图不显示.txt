@@ -1,0 +1,30 @@
+遭遇input与button按钮背景图失效不显示的解决办法
+
+ 笔者从事网页前端代码页面工程师已有多年，作为一个网页重构人员常常会遇到一些莫名其妙的DIV+CSS（正确的说法是XHTML+CSS）在 IE、FireFox火狐、 谷歌浏览器CHROME、苹果浏览器Safari、Opera下不兼容的问题，其中IE6最为棘手，历来IE6就被诸位前端代码人员所诅咒，无奈其用户在 中国大陆又非常多！可恶的微软啊，你当年造IE6的时候为何不严格遵守W3C标准呢？
+
+今天做公司的交友网站前端网页页面的时候笔者又遇到了难解决的网页前端DIVCSS代码问题，一个平时不会发生的怪事情发生了：为网页代码中的 Form表单中的input 和 button 按钮标签在CSS样式代码文件中设置了背景图background-image竟然失效不起作用不显示了！笔者查看了这个代码在IE、火狐等各浏览器下的 浏览效果，尽管该代码在DW(DreamWeaver)中显示正常，但是在浏览器中它的背景图片确实没有出现没有显示出来，想了很多解决办法和方案，动用 了很多手段，连CSSHACK都用上了，就是不出来了，后来好一顿折腾才搞定，网页前端页面工程师也不好做啊！
+
+笔者在看.看.呗[kankanbei.com]查看了一些资料，也上网查了一下，貌似大家都没遇到这种问题，笔者先后排除了以下CSS代码冲突出错和不兼容的可能性：
+
+1.背景图是PNG，兼容性不好，浏览器不支持。（改用JPG和GIF试了下，结果一样是input 和 button按钮背景图不显示）。
+
+2.没有让input 和 button这种表单代码成为块元素BLOCK。（设置了display:block,结果问题依旧啊！晕！-_-）
+
+3.没有设置元素的高和宽。（设置了width和height之后，background-image背景图依旧失效）
+
+原本CSS代码如下：
+ background-image: url(images/kankanbei.jpg);
+ background-repeat: no-repeat;
+
+后来经过不断调试和探索，最终发现 只需加以下2行代码便可以解决CSS中设置了按钮背景图，但是浏览器中背景图失效不显示的网页前端代码兼容性问题：
+ background-image: url(images/kankanbei.jpg);
+ background-repeat: no-repeat;
+ background-color: transparent;//关键就是将背景色设置为透明，好让背景图显示出来。这个代码在DW的IDE环境下是没有的，需要你手动输入这种背景颜色透明的CSS代码
+ border:none;
+
+最后看看呗[kankanbei.com]总结为：外部CSS代码中有某一处设置的属性导致此处按钮的原背景无法去掉，进而导致背景图片失效没显示。另外一种解决就是使用A标签来替代这些input和button标签。
+
+
+
+
+http://www.kankanbei.com/html/matrix/divcss/201110/08-387.html
