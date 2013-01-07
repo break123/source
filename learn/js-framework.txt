@@ -1,0 +1,4 @@
+jQuery, Prototype, Mootools, YUI, etc
+jquery.com
+www.prototypejs.org
+www.mootools.net
