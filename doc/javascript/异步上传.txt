@@ -1,0 +1,149 @@
+php ajax实现异步上传图片  
+http://wangjian84075041.blog.163.com/blog/static/1867033802011112110179891/
+
+在开始之前，我觉得是有必要把通WEB上传文件的原理简单说一下的。
+实际上，在这里不管是PHP，JSP，还是ASP处理上传的文件，其实都是WEB早已把文件上传到服务器了，我们只是运用上传处理函数来处理上传的文件。
+而处理函数一般都是用PHP,JSP,ASP等服务端语言来实现的。那么如何通过WEB(HTTP协议来上传文件呢？)你需要类似于以下的HTML代码：
+test.html
+<form action="do_file_upload.php" method="post" enctype="multipart/form-data">
+<p>Pictures:
+<input type="file" name="picture" />
+<input type="submit" value="Send" />
+</p>
+</form>
+注意：enctype="multipart/form-data"，是必需的，它告诉FORM表这个是一文件上传类型,一旦这次请求成功后，文件就被上传到了服务器的临时文件夹中，
+至于到达目的地后，文件将会被怎么样处理那就是PHP,JSP,ASP的事了。
+（不过，你不要高兴的太早，如果该文件没有被移动到其它地方也没有被改名，则该文件将在表单请求结束时被删除。所以我们要写一个处理上传文件的脚本）
+这里我们用PHP来处理
+do_file_upload.php
+<?php
+$error = ""; //上传文件出错信息
+$msg = "";
+$fileElementName = 'picture';
+    $allowType = array(".jpg",".gif",".png"); //允许上传的文件类型
+    $num      = strrpos($_FILES['picture']['name'] ,'.');  
+$fileSuffixName    = substr($_FILES['picture']['name'],$num,8);//此数可变  
+$fileSuffixName    = strtolower($fileSuffixName); //确定上传文件的类型
+    
+$upFilePath             = 'd:/'; //最终存放路径
+
+if(!empty($_FILES[$fileElementName]['error']))
+{
+   switch($_FILES[$fileElementName]['error'])
+   {
+
+    case '1':
+     $error = '传的文件超过了 php.ini 中 upload_max_filesize 选项限制的值';
+     break;
+    case '2':
+     $error = '上传文件的大小超过了 HTML 表单中 MAX_FILE_SIZE 选项指定的值';
+     break;
+    case '3':
+     $error = '文件只有部分被上传';
+     break;
+    case '4':
+     $error = '没有文件被上传';
+     break;
+
+    case '6':
+     $error = '找不到临时文件夹';
+     break;
+    case '7':
+     $error = '文件写入失败';
+     break;
+    default:
+     $error = '未知错误';
+   }
+}elseif(empty($_FILES['fileToUpload']['tmp_name']) || $_FILES['fileToUpload']['tmp_name'] == 'none')
+{
+   $error = '没有上传文件.';
+}else if(!in_array($fileSuffixName,$allowType))
+{
+   $error = '不允许上传的文件类型'; 
+}else{
+  $ok=@move_uploaded_file($_FILES['fileToUpload']['tmp_name'],$upFilePath);
+   if($ok === FALSE){
+    $error = '上传失败';
+   }
+}
+?>
+
+
+另注：关于$_FILES数组
+此数组包含有所有上传的文件信息,即记录下了上传文件时的相关信息。 
+以上范例中 $_FILES 数组的内容如下所示。我们假设文件上传字段的名称如上例所示，为 userfile。名称可随意命名。
+
+$_FILES['userfile']['name'] 
+客户端机器文件的原名称。
+
+$_FILES['userfile']['type'] 
+文件的 MIME 类型，如果浏览器提供此信息的话。一个例子是“image/gif”。不过此 MIME 类型在 PHP 端并不检查，因此不要想当然认为有这个值。
+
+$_FILES['userfile']['size'] 
+已上传文件的大小，单位为字节。
+
+$_FILES['userfile']['tmp_name'] 
+文件被上传后在服务端储存的临时文件名。
+
+$_FILES['userfile']['error'] 
+和该文件上传相关的错误代码。此项目是在 PHP 4.2.0 版本中增加的。
+
+
+【AJAX文件上传】
+
+其实就是实现无刷新式的文件上传。可采用IFRAME文件上传原理。
+实际上在用PHP上传文件时。。。只能用$_FILES形式，但是若我们只是单一的用JS方式取其ID，如<input id='img' type='file'>..document.getElementById('img').value或者jquery形式的$("#img")都是不能正真实际上传的（但是还是有很多人这样做，刚开始时我也是）。
+可是功能上又要要求实现所谓的“异步上传”，怎么办呢？？只能借助于第三方的组件，或者自己写一个（在网页里嵌入一个IFRAME）。但如果是考虑开发时间，那以用第三方的，这里有一个不错的jQuery 的Ajax文件上传的组件，是“ajaxfileupload.js",其组件下载地址为：http://www.phpletter.com/，下载完毕里面有一个php的应用demo，很容易看懂的。
+过程：
+(1 )前端上文件的代码： test.php       
+
+    <script type="text/javascript" src="jquery.js"></script> 
+    <script type="text/javascript" src="ajaxfileupload.js"></script>
+    <script type="text/javascript">
+       function ajaxFileUpload()
+               {
+                  $.ajaxFileUpload
+                     (
+                       {
+                            url:'doajaxfileupload.php', //你处理上传文件的服务端
+                            secureuri:false,
+                            fileElementId:'img',
+                            dataType: 'json',
+                            success: function (data)
+                                  {
+                                    alert(data.file_infor);
+                                  }
+                               }
+                         )
+                       return false;
+                 } 
+     </script>
+相应的HTML为：
+        <input id="img" type="file" size="45" name="img" class="input">
+        <button class="button" id="buttonUpload" onclick="return ajaxFileUpload();">Upload</button>
+
+这样客户端就完成了。
+         
+(2) 在服务器端时   doajaxfileupload.php
+
+   此处为了简便的检测是否真正的传值过来了，你可以将它存起来了。
+             $file_infor = var_export($_FILES,true);
+             file_put_contents("d:file_infor.php".$file_infor);
+   这样你打来刚生成的file_infor.php文件时，你又看到了熟悉的信息了：
+     array(
+             'name'=>'lamp.jpg',
+             'type'=>'image/pjpeg',
+             'tmp_name'=>'c:\windows\temp\phpFA.tmp',
+             'error'=>0,
+             'size'=>3127
+         )
+当然，真正的处理类于这样的：
+   <?php
+     $upFilePath = "d:/";
+     $ok=@move_uploaded_file($_FILES['img']['tmp_name'],$upFilePath);
+   if($ok === FALSE){
+    echo json_encode('file_infor'=>'上传失败');
+   }else{
+    echo json_encode('file_infor'=>'上传成功');
+   }
+   ?>    

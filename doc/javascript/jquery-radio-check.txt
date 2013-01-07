@@ -1,0 +1,171 @@
+jQuery RadioButton、input、CheckBox取值赋值：
+
+jQuery RadioButton、input、CheckBox取值赋值
+
+==============================
+//radio 赋值
+	$('input[@name="del"][value='+0+']').attr("checked",true);//有效  
+	//radio 取值
+	var gender = $("input[name='del']:checked").val();
+=================select===================================	
+// select 设置选中
+$("#parent_ID").attr('value',$.query.get('pid'));	
+
+比如<select class="selector"></select>
+
+1、设置value为pxx的项选中
+
+     $(".selector").val("pxx");
+
+2、设置text为pxx的项选中
+
+    $(".selector").find("option[text='pxx']").attr("selected",true);
+
+    这里有一个中括号的用法，中括号里的等号的前面是属性名称，不用加引号。很多时候，中括号的运用可以使得逻辑变得很简单。
+
+3、获取当前选中项的value
+
+    $(".selector").val();
+
+4、获取当前选中项的text
+
+    $(".selector").find("option:selected").text();
+
+    这里用到了冒号，掌握它的用法并举一反三也会让代码变得简洁。
+
+ 
+
+很多时候用到select的级联，即第二个select的值随着第一个select选中的值变化。这在jquery中是非常简单的。
+
+如：$(".selector1").change(function(){
+
+     // 先清空第二个
+
+      $(".selector2").empty();
+
+     // 实际的应用中，这里的option一般都是用循环生成多个了
+
+      var option = $("<option>").val(1).text("pxx");
+
+      $(".selector2").append(option);
+
+});
+=================================================
+
+
+// 获取多个 checkbox ，返回字符串
+$('input[name="'+classname+'"]').each(function(){
+		if($(this).attr('checked')==true)
+		ids+=$(this).val()+',';
+	});
+============================	
+	
+2011-03-25 12:10
+
+1、jquery 获取单选组radio
+
+$("input[name='name']:checked").val();
+
+2、jquery获取radiobutton的下一个值
+
+$("input[name='name']:checked").next().text()
+
+$("input[name='name']:checked").val()
+
+3、jquery 获取input的值
+
+$('#id').val()
+
+4、jquery判断多选框checkbox
+
+$("#id:checkbox").attr("checked")
+
+取值 $("#id").attr("value")；
+
+赋值则是在text()、val()里面直接给值
+
+JQUERY如何获取text,areatext,radio,checkbox,select值？
+
+$("input").val();
+
+$("textarea").text();
+
+$("select").val();
+
+控制表单元素：
+文本框，文本区域：$("#txt").attr("value",'');//清空内容
+$("#txt").attr("value",'11');//填充内容
+
+多选框checkbox： $("#chk1").attr("checked",'');//不打勾
+$("#chk2").attr("checked",true);//打勾
+if($("#chk1").attr('checked')==undefined) //判断是否已经打勾
+
+单选组radio： $("input[@type=radio]").attr("checked",'2');//设置value=2的项目为当前选中项
+下拉框select： $("#sel").attr("value",'-sel3');//设置value=-sel3的项目为当前选中项
+$("<option value='1'>1111</option><option value='2'>2222</option>").appendTo("#sel")//添加下拉框的option
+$("#sel").empty()；//清空下拉框
+=================================================================================================================================
+jQuery 获取和设置select下拉框的值文章分类:.net编程
+
+获取Select ：
+
+获取select 选中的 text :
+
+$("#ddlRegType").find("option:selected").text();
+
+获取select选中的 value:
+
+$("#ddlRegType").val();
+
+获取select选中的索引:
+
+$("#ddlRegType ").get(0).selectedIndex;
+
+设置select:
+
+设置select 选中的索引：
+
+$("#ddlRegType ").get(0).selectedIndex=index;//index为索引值
+
+设置select 选中的value：
+
+$("#ddlRegType ").attr("value","Normal“);
+
+$("#ddlRegType ").val("Normal");
+
+$("#ddlRegType ").get(0).value = value;
+
+设置select 选中的text:
+
+var count=$("#ddlRegType option").length;
+
+for(var i=0;i<count;i++)
+{ if($("#ddlRegType ").get(0).options[i].text == text)
+{
+$("#ddlRegType ").get(0).options[i].selected = true;
+break;
+}
+}
+
+$("#select_id option[text='jQuery']").attr("selected", true);
+
+设置select option项:
+
+$("#select_id").append("<option value='Value'>Text</option>"); //添加一项option
+
+$("#select_id").prepend("<option value='0'>请选择</option>"); //在前面插入一项option
+
+$("#select_id option:last").remove(); //删除索引值最大的Option
+
+$("#select_id option[index='0']").remove();//删除索引值为0的Option
+
+$("#select_id option[value='3']").remove(); //删除值为3的Option
+
+$("#select_id option[text='4']").remove(); //删除TEXT值为4的Option
+
+清空 Select:
+
+$("#ddlRegType ").empty();
+
+=======================================================checkbox操作==============================================
+http://blog.csdn.net/longyangyangyang/article/details/6128141

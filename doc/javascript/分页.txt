@@ -1,0 +1,30 @@
+官网地址：
+http://archive.plugins.jquery.com/project/pagination
+
+code： 
+1. 引入文件
+<link href="../templates/css/pagination.css" rel="stylesheet"> 
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" src="../templates/js/jquery.pagination.js"></script>
+2. js：
+$().ready(function(){
+    	   $("#Pagination").pagination(222, {
+    		    current_page:5, // 初始化第几页
+    		    
+    			items_per_page:10, //每页记录数
+    			link_to:'__id__', //连接到  __id__会被页码数替换
+    			num_display_entries:10, //显示最大页数
+    			next_text:'next',
+    			prev_text:'prev',
+    			next_show_always : true, // 如果设成false 当页码是最后一页就不显示
+    			prev_show_always : true, //类上
+    			num_edge_entries : 1, // 设为1 最后和第一页总是显示，设为更大值则显示更多页码 Default: 0
+    			ellipse_text : '...',// 在省略的页码处显示文本
+    			callback : handlePaginationClick(11,22)
+    		});
+    		function handlePaginationClick(a,b){}
+
+});
+3. html
+<div id="Pagination" class="pagination">
+（id可以任意命名 ，class必须为pagination）

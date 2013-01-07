@@ -1,0 +1,62 @@
+JQuery使我们在开发Ajax应用程序的时候提高了效率，减少了许多兼容性问题，但时间久了，也让我们离不开他。比如简单的Jquery Ajax请求的封装让我们忘却了最原始的XmlHttpRequest对象和他的属性,方法，也让我们远离事情的真相。
+
+在Ajax项目中，经常遇到需要服务器端返回错误的消息提示，或者消息码之类的数据。查过一些帮助，解决方案，很多网站是返回错误的消息JSON数据或者脚本，这种方式当我们用JQuery.ajax()的时候出现了问题，jquery.ajax()回调函数success(data)的data参数可能是 xmlDoc, jsonObj, html, text, 等等...这取决于我们dataType设置和MIME.很多时候我们的错误处理都是统一的处理，不管你请求的是XML,JSON...。不光不好统一，还容易出现解析错误等等情况。
+
+
+参考了Prototyp框架的做法，做了一个Jquery的错误扩展。
+
+原理：Prototype思路是把服务器处理结果状态信息写在Header里面，这种方式既保证了reponse body的干净，同时适应XML,JSON，HTML,Text的返回情况。
+
+　　　服务器端只需要 Response.AddHeader("Error-Json", "{code:2001,msg:'User settings is null!',script:''}");
+
+实现：为了不影响原有的Jquery.ajax方法，同时不破坏jquery库源文件，做了如下扩展，代码很简单都能看懂：
+
+;(function($){
+    var ajax=$.ajax;
+    $.ajax=function(s){
+        var old=s.error;
+        var errHeader=s.errorHeader||"Error-Json";
+        s.error=function(xhr,status,err){
+            var errMsg = window["eval"]("(" + xhr.getResponseHeader(errHeader) + ")");
+            old(xhr,status,errMsg||err);
+        }
+        ajax(s);
+    }
+
+})(jQuery);
+
+
+ 
+
+使用方法：
+
+　　服务器端：我们是对错误进行扩展，如果要让jquery.ajax破获错误，必须要服务器端返回非200的错误码，由于Opera浏览器下面对400以上的错误码，都无法获得请求的Header，建议如果要支持Opera，最好返回30*错误，这是Opera能接受Header的错误范围。没有做包装，可以再单独把Catch内容出来。
+
+ 
+
+try {
+                context.Response.Write(GetJson(context));
+                throw new Exception("msg");
+            }
+            catch {
+                context.Response.ClearContent();
+                context.Response.StatusCode = 300;
+                context.Response.AddHeader("Error-Json", "{code:2001,msg:'User settings is null!',script:''}");
+                context.Response.End();
+            }
+
+ 
+
+　　客户端：
+
+　　
+
+$.ajax({
+            url: this.ajaxUrl,
+            type: "POST",
+            success: callback,
+            error: function(xhr,status,errMsg){
+        alert(errMsg.code+"<br/>"+errMsg.msg);
+            }
+        });
+也许不是最好的，但觉得用起来很方便，忘了个写新增参数errorHeader:"Error-Json",这个header头key根据你后台设定配置。

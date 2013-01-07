@@ -1,0 +1,4 @@
+http://jqueryui.com/
+
+分页类与提示框类
+http://www.cnblogs.com/hcbwei/archive/2009/08/31/1557289.html
