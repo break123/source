@@ -1,0 +1,461 @@
+如何写出兼容好的css：
+1. 条件注释
+
+<!--[if lte IE 6]>
+<![endif]-->
+IE6及其以下版本可见
+ 
+<!--[if lte IE 7]>
+<![endif]-->
+IE7及其以下版本可见
+ 
+<!--[if IE 6]>
+<![endif]-->
+只有IE6版本可见
+ 
+<![if !IE]>
+<![endif]>
+除了IE以外的版本
+ 
+<!--[if lt IE 8]>
+<![endif]-->
+IE8及其以下的版本可见
+ 
+ 
+<!--[if gte IE 7]>
+<![endif]-->
+IE7及其以下的版本可见
+ 
+ 
+用法：
+（1）
+可使用如下代码检测当前IE浏览器的版本（注意：在非IE浏览器中是看不到效果的） <!––[if IE]>
+       <h1>您正在使用IE浏览器</h1>        <!––[if IE 5]>
+           <h2>版本 5</h2>        <![endif]––>
+       <!––[if IE 5.0]>
+           <h2>版本 5.0</h2>        <![endif]––>
+       <!––[if IE 5.5]>
+           <h2>版本 5.5</h2>        <![endif]––>
+       <!––[if IE 6]>
+           <h2>版本 6</h2>        <![endif]––>
+       <!––[if IE 7]>
+           <h2>版本 7</h2>        <![endif]––>
+<![endif]––>
+那如果当前的浏览器是IE，但版本比IE5还低，该怎么办呢，可以使用<!–[if ls IE 5]>，当然，根据条件注释只能在IE5+的环境之下，所以<!–[if ls IE 5]>根本不会被执行。 lte：就是Less than or equal to的简写，也就是小于或等于的意思。 lt ：就是Less than的简写，也就是小于的意思。 gte：就是Greater than or equal to的简写，也就是大于或等于的意思。 gt ：就是Greater than的简写，也就是大于的意思。 ! ： 就是不等于的意思，跟javascript里的不等于判断符相同
+ 
+ 
+（2）
+应该如何应用条件注释     本文一开始就说明了，因为IE各版本的浏览器对我们制作的WEB标准的页面解释不一样，具体就是对CSS的解释不同，我们为了兼容这些，可运用条件注释来各自定义，最终达到兼容的目的。比如： < !–- 默认先调用css.css样式表 –->
+<link rel="stylesheet" type="text/css" href="css.css" />< !-–[if IE 7]>
+<!–- 如果IE浏览器版是7,调用ie7.css样式表- –>
+<link rel="stylesheet" type="text/css" href="ie7.css" />< ![endif]–->
+<!–-[if lte IE 6]>
+<!–- 如果IE浏览器版本小于等于6,调用ie.css样式表 -–>
+<link rel="stylesheet" type="text/css" href="ie.css" />< ![endif]–>    这其中就区分了IE7和IE6向下的浏览器对CSS的执行，达到兼容的目的。同时，首行默认的css.css还能与其他非IE浏览器实现兼容。
+    注意：默认的CSS样式应该位于HTML文档的首行，进行条件注释判断的所有内容必须位于该默认样式之后。     比如如下代码，在IE浏览器下执行显示为红色，而在非IE浏览器下显示为黑色。如果把条件注释判断放在首行，则不能实现。该例题很能说明网页对IE浏览器和非IE浏览器间的兼容性问题解决。 <style type="text/css"> body{ background-color: #000; } < /style> < !-–[if IE]>
+<style type="text/css">body{background-color: #F00;}< /style>< ![endif]–->
+同时，有人会试图使用<!–-[if !IE]>来定义非IE浏览器下的状况，但注意：条件注释只有在IE浏览器下才能执行，这个代码在非IE浏览下非单不是执行该条件下的定义，而是当做注释视而不见。
+    正常就是默认的样式，对IE浏览器需要特殊处理的，才进行条件注释。在HTML文件里，而不能在CSS文件中使用。
+现在的DWcs4里面，已经装备了这些注释：在“窗口-->代码片段-->注释”里。其他的版本没太注意到。
+
+
+
+2. css hack
+示例：
+<style>  
+    #test   
+    {   
+        width:300px;   
+        height:300px;   
+          
+        background-color:blue;      /*firefox*/
+        background-color:red\9;      /*all ie*/
+        background-color:yellow\0;    /*ie8*/
+        +background-color:pink;        /*ie7*/
+        _background-color:orange;       /*ie6*/
+    }  
+    :root #test { background-color:purple\9; }  /*ie9*/
+    @media all and (min-width:0px){ #test {background-color:black\0;} }  /*opera*/
+    @media screen and (-webkit-min-device-pixel-ratio:0){ #test {background-color:gray;} }  /*chrome and safari*/
+</style>  
+
+=====解释======
+background-color:blue; 各个浏览器都认识，这里给firefox用；
+background-color:red\9;\9所有的ie浏览器可识别；
+background-color:yellow\0; \0 是留给ie8的，但笔者测试，发现最新版opera也认识，汗。。。不过且慢，后面自有hack写了给opera认的，所以，\0我们就认为是给ie8留的；
++background-color:pink; + ie7定了；
+_background-color:orange; _专门留给神奇的ie6；
+:root #test { background-color:purple\9; } :root是给ie9的，网上流传了个版本是 :root #test { background-color:purple\0;}，呃。。。这个。。。，新版opera也认识，所以经笔者反复验证最终ie9特有的为:root 选择符 {属性\9;}
+@media all and (min-width:0px){ #test {background-color:black\0;} } 这个是老是跟ie抢着认\0的神奇的opera，必须加个\0,不然firefox，chrome，safari也都认识。。。
+@media screen and (-webkit-min-device-pixel-ratio:0){ #test {background-color:gray;} }最后这个是浏览器新贵chrome和safari的。
+
+好了就这么多了，特别注意以上顺序是不可以改变的。css hack虽然可以解决个浏览器之间css显示的差异问题，但是毕竟不符合W3C规范，我们平时写css最好是按照标准来，这样对我们以后维护也是大有好处的，实在不行再用。
+
+====================
+所有浏览器 通用 
+height: 100px; 
+
+IE6 专用 
+_height: 100px; 
+
+IE6 专用 
+*height: 100px; 
+
+IE7 专用 
+*+height: 100px; 
+
+IE7、FF 共用 
+height: 100px !important;
+==================其他方法：
+
+1, !important
+随着IE7对!important的支持, !important 方法现在只针对IE6的HACK.(注意写法.记得该声明位置需要提前.)
+以下为引用的内容：
+<style>
+#wrapper
+{
+width: 100px!important;
+width: 80px;
+}
+</style>
+2, IE6/IE7对FireFox
+以下为引用的内容：
+*+html 与 *html 是IE特有的标签, firefox 暂不支持.而*+html 又为 IE7特有标签.
+<style>
+#wrapper
+{
+#wrapper { width: 120px; }
+*html #wrapper { width: 80px;}
+*+html #wrapper { width: 60px;}
+}
+</style>
+注意:
+*+html 对IE7的HACK 必须保证HTML顶部有如下声明：
+<!DOCTYPE HTML PUBLIC “-//W3C//DTD HTML 4.01 Transitional//EN”　”http://www.w3.org/TR/html4/loose.dtd”>
+
+二、万能 float 闭合
+关于 clear float 的原理可参见 [How To Clear Floats Without Structural Markup]
+将以下代码加入Global CSS 中,给需要闭合的div加上 class=”clearfix” 即可,屡试不爽.
+以下为引用的内容：<style>
+.clearfix:after
+{
+content:”.”;
+display:block;
+height:0;
+clear:both;
+visibility:hidden;
+}
+.clearfix
+{
+display:inline-block;
+}
+
+.clearfix {display:block;}
+
+
+</style>
+==========================
+
+三、其他兼容技巧
+1, FF下给 div 设置 padding 后会导致 width 和 height 增加, 但IE不会.(可用!important解决) 如width:115px !important;width:120px;padding:5px;
+　必须注意的是， !important; 一定要在前面。   
+2, 居中问题.
+1).垂直居中.将 line-height 设置为 当前 div 相同的高度, 再通过 vertical-align: middle.( 注意内容不要换行.)
+2).水平居中. margin: 0 auto;(当然不是万能)
+3, 若需给 a 标签内内容加上 样式, 需要设置 display: block;(常见于导航标签)
+4, FF 和 IE 对 BOX 理解的差异导致相差 2px 的还有设为 float的div在ie下 margin加倍等问题.
+5, ul 标签在 FF 下面默认有 list-style 和 padding . 最好事先声明, 以避免不必要的麻烦. (常见于导航标签和内容列表)
+6, 作为外部 wrapper 的 div 不要定死高度, 最好还加上 overflow: hidden.以达到高度自适应.
+7, 关于手形光标. cursor: pointer. 而hand 只适用于 IE.
+兼容代码:兼容最推荐的模式。 
+ 
+.submitbutton { 
+float:left; 
+width: 40px; 
+height: 57px; 
+margin-top: 24px; 
+margin-right: 12px; 
+} 
+ 
+*html .submitbutton { 
+margin-top: 21px; 
+} 
+ 
+*+html .submitbutton { 
+margin-top: 21px; 
+} 
+
+
+什么是浏览器兼容：当我们使用不同的浏览器（Firefox IE7 IE6）访问同一个网站，或者页面的时候，会出现一些不兼容的问题，有的显示出来正常，有的显示出来不正常，我们在编写CSS的时候会很恼火，刚修复了这个浏览器的问题，结果另外一个浏览器却出了新问题。而兼容就是一种办法，能让你在一个CSS里面独立的写支持不同浏览器的样式。这下就和谐了。呵呵！ 
+
+最近微软发布的IE7浏览器的兼容性确实给一些网页制作人员添加了一个沉重的负担，虽然IE7已经走向标准化，但还是有许多和FF不同的地方，所以需要用到IE7的兼容。
+有一点逻辑思想的人都会知道可以用IE和FF的兼容结合起来使用，下面介绍三个兼容，例如：（适合新手，呵呵，高手就在这里路过吧。） 
+
+程序代码 
+
+第一个兼容，IE FF 所有浏览器 公用（其实也不算是兼容） 
+height:100px; 
+第二个兼容 IE6专用 
+_height:100px; 
+第三个兼容 IE6 IE7公用 
+*height:100px; 
+
+介绍完了这三个兼容了，下面我们再来看看如何在一个样式里分别给一个属性定义IE6 IE7 FF专用的兼容，看下面的代码，顺序不能错哦： 
+
+程序代码 
+
+height:100px; 
+*height:120px; 
+_height:150px; 
+
+下面我简单解释一下各浏览器怎样理解这三个属性： 
+
+在FF下，第2、3个属性FF不认识，所以它读的是 height:100px; 
+
+在IE7下，第三个属性IE7不认识，所以它读第1、2个属性，又因为第二个属性覆盖了第一个属性，所以IE7最终读出的是第2个属性 *height:120px; 
+
+在IE6下，三个属性IE6都认识，所以三个属性都可以读取，又因为第三个属性覆盖掉前2个属性，所以IE6最终读取的是第三个属性。 
+1 针对firefox ie6 ie7的css样式
+现在大部分都是用!important来hack，对于ie6和firefox测试可以正常显示，
+但是ie7对!important可以正确解释，会导致页面没按要求显示！找到一个针
+对IE7不错的hack方式就是使用“*+html”，现在用IE7浏览一下，应该没有问题了。
+现在写一个CSS可以这样：
+以下为引用的内容：
+#1 { color: #333; }
+* html #1 { color: #666; }
+*+html #1 { color: #999; }
+那么在firefox下字体颜色显示为#333，IE6下字体颜色显示为#666，IE7下字体颜色显示为#999。
+2 css布局中的居中问题
+主要的样式定义如下：
+body {TEXT-ALIGN: center;}
+#center { MARGIN-RIGHT: auto; MARGIN-LEFT: auto; }
+说明：
+首先在父级元素定义TEXT-ALIGN: center;这个的意思就是在父级元素内的内容居中；对于IE这样设定就已经可以了。
+但在mozilla中不能居中。解决办法就是在子元素定义时候设定时再加上“MARGIN-RIGHT: auto;MARGIN-LEFT: auto; ”
+需要说明的是，如果你想用这个方法使整个页面要居中，建议不要套在一个DIV里，你可以依次拆出多个div，
+只要在每个拆出的div里定义MARGIN-RIGHT: auto;MARGIN-LEFT: auto; 就可以了。
+3 盒模型不同解释
+#box{ width:600px; //for ie6.0- w\idth:500px; //for ff+ie6.0}
+#box{ width:600px!important //for ff width:600px; //for ff+ie6.0 width :500px; //for ie6.0-}
+4 浮动ie产生的双倍距离
+#box{ float:left; width:100px; margin:0 0 0 100px; //这种情况之下IE会产生200px的距离 display:inline; //使浮动忽略}
+这里细说一下block,inline两个元素,Block元素的特点是:总是在新行上开始,高度,宽度,行高,边距都可以控制(块元素);Inline元素的特点是:和其他元素在同一行上,…不可控制(内嵌元素);
+#box{ display:block; //可以为内嵌元素模拟为块元素 display:inline; //实现同一行排列的的效果 diplay:table;
+IE不认得min-这个定义，但实际上它把正常的width和height当作有min的情况来使。这样问题就大了，如果只用宽度和高度，
+正常的浏览器里这两个值就不会变，如果只用min-width和min-height的话，IE下面根本等于没有设置宽度和高度。
+比如要设置背景图片，这个宽度是比较重要的。要解决这个问题，可以这样：
+#box{ width: 80px; height: 35px;}html>body #box{ width: auto; height: auto; min-width: 80px; min-height: 35px;}
+6 页面的最小宽度
+min-width是个非常方便的CSS命令，它可以指定元素最小也不能小于某个宽度，这样就能保证排版一直正确。但IE不认得这个，
+而它实际上把width当做最小宽度来使。为了让这一命令在IE上也能用，可以把一个<div> 放到 <body> 标签下，然后为div指定一个类：
+然后CSS这样设计：
+#container{ min-width: 600px; width:expression_r(document.body.clientWidth < 600? “600px”: “auto” );}
+第一个min-width是正常的；但第2行的width使用了Javascript，这只有IE才认得，这也会让你的HTML文档不太正规。它实际上通过Javascript的判断来实现最小宽度。
+7 清除浮动
+.hackbox{ display:table; //将对象作为块元素级的表格显示}或者.hackbox{ clear:both;}
+或者加入:after（伪对象）,设置在对象后发生的内容，通常和content配合使用，IE不支持此伪对象，非Ie 浏览器支持，
+所 以并不影响到IE/WIN浏览器。这种的最麻烦的……#box:after{ content: “.”; display: block; height: 0; clear: both; visibility: hidden;}
+8 DIV浮动IE文本产生3象素的bug
+左边对象浮动，右边采用外补丁的左边距来定位，右边对象内的文本会离左边有3px的间距.
+#box{ float:left; width:800px;}#left{ float:left; width:50%;}#right{ width:50%;}*html #left{ margin-right:-3px; //这句是关键}
+HTML代码<div id=”box”> <div id=”left”></div> <div id=”right”></div></div>
+9 属性选择器(这个不能算是兼容,是隐藏css的一个bug)
+p[id]{}div[id]{}
+这个对于IE6.0和IE6.0以下的版本都隐藏,FF和OPera作用
+属性选择器和子选择器还是有区别的,子选择器的范围从形式来说缩小了,属性选择器的范围比较大,如p[id]中,所有p标签中有id的都是同样式的.
+10 IE捉迷藏的问题
+当div应用复杂的时候每个栏中又有一些链接，DIV等这个时候容易发生捉迷藏的问题。
+有些内容显示不出来，当鼠标选择这个区域是发现内容确实在页面。
+解决办法：对#layout使用line-height属性 或者给#layout使用固定高和宽。页面结构尽量简单。
+11 高度不适应 
+
+高度不适应是当内层对象的高度发生变化时外层高度不能自动进行调节，特别是当内层对象使用 
+margin 或paddign 时。例： 
+
+<div id=”box”> 
+<p>p对象中的内容</p> 
+</div> 
+
+CSS： 
+
+#box {background-color:#eee; } 
+#box p {margin-top: 20px;margin-bottom: 20px; text-align:center; } 
+
+解决方法：在P对象上下各加2个空的div对象CSS代码：.1{height:0px;overflow:hidden;}或者为DIV加上border属性。 
+
+屏蔽IE浏览器（也就是IE下不显示） 
+*:lang(zh) select {font:12px !important;}  
+select:empty {font:12px !important;}  
+这里select是选择符，根据情况更换。第二句是MAC上safari浏览器独有的。 
+
+仅IE7识别 
+*+html {…} 
+当面临需要只针对IE7做样式的时候就可以采用这个兼容。 
+
+IE6及IE6以下识别 
+* html {…} 
+这个地方要特别注意很多地主都写了是IE6的兼容其实IE5.x同样可以识别这个兼容。其它浏览器不识别。 
+html >body select {……} 
+这句与上一句的作用相同。 
+
+仅IE6不识别 
+select { display :none;} 
+这里主要是通过CSS注释分开一个属性与值，流释在冒号前。 
+
+仅IE6与IE5不识别 
+select { display :none;} 
+这里与上面一句不同的是在选择符与花括号之间多了一个CSS注释。 
+
+仅IE5不识别 
+select { display:none;} 
+这一句是在上一句中去掉了属性区的注释。只有IE5不识别 
+
+盒模型解决方法 
+selct {width:IE5.x宽度; voice-family :""}""; voice-family:inherit; width:正确宽度;} 
+盒模型的清除方法不是通过!important来处理的。这点要明确。 
+
+清除浮动 
+select:after {content:"."; display:block; height:0; clear:both; visibility:hidden;} 
+在Firefox中，当子级都为浮动时，那么父级的高度就无法完全的包住整个子级，那么这时用这个清除浮动的兼容来对父级做一次定义，那么就可以解决这个问题 。 
+
+截字省略号 
+select { -o-text-overflow:ellipsis; text-overflow:ellipsis; white-space:nowrapoverflow:hidden; } 
+这个是在越出长度后会自行的截掉多出部分的文字，并以省略号结尾，很好的一个技术。只是目前Firefox并不支持。 
+
+只有Opera识别 
+@media all and (min-width: 0px){ select {……} } 
+针对Opera浏览器做单独的设定。 
+
+以上都是写CSS中的一些兼容，建议遵循正确的标签嵌套(div ul li 嵌套结构关系)，这样可以减少你使用兼容的频率，不要进入理解误区，并不是一个页面就需要很多的兼容来保持多浏览器兼容)，很多情况下也许一个兼容都不用也可以让浏览器工作得非常好，这些都是用来解决局部的兼容性问题，如果希望把兼容性的内容也分离出来，不妨试一下下面的几种过滤器。这些过滤器有的是写在CSS中通过过滤器导入特别的样式，也有的是写在HTML中的通过条件来链接或是导入需要的补丁样式。 
+
+IE5.x的过滤器，只有IE5.x可见 
+@media tty { 
+i{content:"";}} @import ’ie5win.css’;  
+
+IE5/MAC的过滤器，一般用不着 
+ 
+
+下面是IE的条件注释，个人觉得用条件注释调用相应 兼容是比较完美的多浏览器兼容的解决办法。把需要兼容的地方单独放到一个文件里面，当浏览器版本符合的时候就可以调用那个被兼容的样式，这样不仅使用起来非常方便，而且对于制作这个CSS本身来讲，可以更严格的观察到是否有必要使用兼容，很多情况下，当我本人写CSS如果把全部代码包括兼容都写到一个CSS文件的时候的时候会很随意，想怎么兼容就怎么兼容，而你独立出来写的时候，你就会不自觉的考虑是否有必要兼容，是先兼容 CSS？还是先把主CSS里面的东西调整到尽可能的不需要兼容？当你仅用很少的兼容就让很多浏览器很乖很听话的时候，你是不是很有成就感呢？你知道怎么选择了吧～～呵呵 
+
+IE的if条件兼容 自己可以灵活使用参看这篇IE条件注释 
+Only IE 
+所有的IE可识别 
+
+只有IE5.0可以识别 
+Only IE 5.0+ 
+IE5.0包换IE5.5都可以识别 
+
+仅IE6可识别 
+Only IE 7/- 
+IE6以及IE6以下的IE5.x都可识别 
+Only IE 7/- 
+仅IE7可识别 
+
+Css 当中有许多的东西不按照某些规律来的话，会让你很心烦，虽然你可以通过很多的兼容，很多的!important 来控制它，但是你会发现长此以往你会很不甘心，看看许多优秀的网站，他们的CSS让IE6,Ie7,Firefox,甚至Safari,Opera运行起来完美无缺是不是很羡慕？而他们看似复杂的模版下面使用的兼容 少得可怜。其实你要知道IE 和 Firefox 并不不是那么的不和谐，我们找到一定的方法，是完全可以让他们和谐共处的。不要你认为发现了兼容的办法，你就掌握了一切，我们并不是兼容的奴隶。 
+
+div ul li 的嵌套顺序 
+
+今天只讲一个规则。就是<div><ul><li>的三角关系。我的经验就是<div>在最外面，里面是<ul>，然后再是<li>，当然<li>里面又可以嵌套<div>什么的，但是并不建议你嵌套很多东西。当你符合这样的规则的时候，那些倒霉的，不听话的间隙就不会在里面出现了，当你仅仅是<div>里面放<li>，而不用<ul>的时候，你会发现你的间隙十分难控制，一般情况下，IE6和IE7会凭空多一些间距。但很多情况你来到下一行，间隙就没了，但是前面的内容又空了很大一块，出现这种情况虽然你可以改变IE的Margin，然后调整Firefox下面的Padding，以便使得两者显示起来得效果很相似，但是你得CSS将变得臭长无比，你不得不多考虑更多可能出现这种问题补救措施，虽然你知道千篇一律来兼容它们，但是你会烦得要命。 
+
+具体嵌套写法 
+
+遵循上面得嵌套方式，<div><ul><li></li></ul></div> 然后在CSS 里面告诉 ul {Margin:0px;Padding:0px;list-style:none;}，其中list-style:none是不让<li>标记的最前方显示圆点或者数字等目录类型的标记，因为IE和Firefox显示出来默认效果有些不一样。因此这样不需要做任何手脚，你的IE6、和IE7、Firefox显示出来的东西(外距，间距，高度，宽度)就几乎没什么区别了，也许细心的你会在某一个时刻发现：两个象素的差别，但那已经很完美了，不需要你通过调整大片的CSS来控制它们的显示了，你愿意，你可以仅仅兼容一两个地方，而且通常这种兼容可以适应各种地方，不需要你重复在不同的地方调试不同的兼容方式–减轻你的烦。你可以ul.class1, ul.class2, ul.class3 {xxx:xxxx}的方式方便的整理出你要兼容的地方，而统一兼容。尝试一下吧，再也不要乱嵌套了，虽然在Div+CSS的方式下你几乎可以想怎么嵌套就怎么嵌套，但是按照上面的规律你将轻松很多，从而事半功倍！
+ 
+六、CSS兼容要点分析IE vs FF
+CSS 兼容要点：
+DOCTYPE 影响 CSS 处理
+FF: div 设置 margin-left, margin-right 为 auto 时已经居中, IE 不行
+FF: body 设置 text-align 时, div 需要设置 margin: auto(主要是 margin-left,margin-right) 方可居中
+FF: 设置 padding 后, div 会增加 height 和 width, 但 IE 不会, 故需要用 !important 多设一个 height 和 width
+FF: 支持 !important, IE 则忽略, 可用 !important 为 FF 特别设置样式
+div 的垂直居中问题: vertical-align:middle; 将行距增加到和整个DIV一样高 line-height:200px; 然后插入文字，就垂直居中了。缺点是要控制内容不要换行
+cursor: pointer 可以同时在 IE FF 中显示游标手指状， hand 仅 IE 可以
+FF: 链接加边框和背景色，需设置 display: block, 同时设置 float: left 保证不换行。参照 menubar, 给 a 和 menubar 设置高度是为了避免底边显示错位, 若不设 height, 可以在 menubar 中插入一个空格XHTML+CSS兼容性解决方案小集
+使用XHTML＋CSS构架好处不少，但也确实存在一些问题，不论是因为使用不熟练还是思路不清晰，我就先把一些我遇到的问题写在下面，省的大家四处找^^
+1、在mozilla firefox和IE中的BOX模型解释不一致导致相差2px解决方法：
+div{margin:30px!important;margin:28px;}
+注意这两个margin的顺序一定不能写反，据阿捷的说法!important这个属性IE不能识别，但别的浏览器可以识别。所以在IE下其实解释成这样：
+div{maring:30px;margin:28px}
+重复定义的话按照最后一个来执行，所以不可以只写margin:XXpx!important;
+2、IE5 和IE6的BOX解释不一致IE5下div{width:300px;margin:0 10px 0 10px;}div的宽度会被解释为300px-10px(右填充)-10px(左填充)最终div的宽度为280px，而在IE6和其他浏览器上宽度则是以300px+10px(右填充)+10px(左填充)=320px来计算的。这时我们可以做如下修改
+div{width:300px!important;width :340px;margin:0 10px 0 10px}
+，关于这个是什么我也不太明白，只知道IE5和firefox都支持但IE6不支持，如果有人理解的话，请告诉我一声，谢了！：）
+3、ul标签在Mozilla中默认是有padding值的,而在IE中只有margin有值所以先定义
+ul{margin:0;padding:0;}
+就能解决大部分问题。
+4、关于脚本，在xhtml1.1中不支持language属性，只需要把代码改为
+< type=”text/java”>
+就可以了
+七、10个你未必知道的CSS技巧
+1、CSS字体属性简写规则
+一般用CSS设定字体属性是这样做的：
+以下为引用的内容：font-weight:bold;font-style:italic;font-varient:small-caps;
+font-size:1em;
+line-height:1.5em;
+font-family:verdana,sans-serif;
+但也可以把它们全部写到一行上去：
+font: bold italic small-caps 1em/1.5em verdana,sans-serif;
+真不错！只有一点要提醒的：这种简写方法只有在同时指定font-size和font-family属性时才起作用。而且，如果你没有设定font-weight, font-style, 以及 font-varient ，他们会使用缺省值，这点要记上。
+2、同时使用两个类
+一般只能给一个元素设定一个类（Class），但这并不意味着不能用两个。事实上，你可以这样：
+<p class=”text side”>…</p>
+同时给P元素两个类，中间用空格格开，这样所有text和side两个类的属性都会加到P元素上来。如果它们两个类中的属性有冲突的话，后设置的起作用，即在CSS文件中放在后面的类的属性起作用。
+补充：对于一个ID，不能这样写<p id=”text side”>…</p>也不能这样写
+3、CSS border的缺省值
+通常可以设定边界的颜色，宽度和风格，如：
+border: 3px solid #000
+这位把边界显示成3像素宽，黑色，实线。但实际上这里只需要指定风格即可。
+如果只指定了风格，其他属性就会使用缺省值。一般地，Border的宽度缺省是medium，一般等于3到4个像素；缺省的颜色是其中文字的颜色。如果这个值正好合适的话，就不用设那么多了。
+4、CSS用于文档打印
+许多网站上都有一个针对打印的版本，但实际上这并不需要，因为可以用CSS来设定打印风格。
+也就是说，可以为页面指定两个CSS文件，一个用于屏幕显示，一个用于打印：
+<link type=”text/css” rel=”stylesheet” href=”/blog/stylesheet.css” media=”screen” /> <link type=”text/css” rel=”stylesheet” href=”printstyle.css” media=”print” />
+第1行就是显示，第2行是打印，注意其中的media属性。
+但应该在打印CSS中写什么东西呢？你可以按设计普通CSS的方法来设定它。设计的同时就可以把这个CSS设成显示CSS来检查它的效果。也许你会使用 display: none 这个命令来关掉一些装饰图片，再关掉一些导航按钮。要想了解更多，可以看“打印差异”这一篇。
+5、图片替换技巧
+一般都建议用标准的HTML来显示文字，而不要使用图片，这样不但快，也更具可读性。但如果你想用一些特殊字体时，就只能用图片了。
+比如你想整个卖东西的图标，你就用了这个图片：
+<h1><img src=”/blog/widget-image.gif” alt=”Buy widgets” /></h1>
+这当然可以，但对搜索引擎来说，和正常文字相比，它们对alt里面的替换文字几乎没有兴趣这是因为许多设计者在这里放许多关键词来骗搜索引擎。所以方法应该是这样的：
+<h1>Buy widgets</h1>
+但这样就没有特殊字体了。要想达到同样效果，可以这样设计CSS：
+h1 { background: url(/blog/widget-image.gif) no-repeat; height: image height text-indent: -2000px }
+注意把image height换成真的图片的高度。这里，图片会当作背景显示出来，而真正的文字由于设定了-2000像素这个缩进，它们会出现在屏幕左边2000点的地方，就看不见了。但这对于关闭图片的人来说，可能全部看不到了，这点要注意。
+6、CSS box模型的另一种调整技巧
+这个Box模型的调整主要是针对IE6之前的IE浏览器的，它们把边界宽度和空白都算在元素宽度上。比如：
+#box { width: 100px; border: 5px; padding: 20px }
+这样调用它：
+<div id=”box”>…</div>
+这时盒子的全宽应该是150点，这在除IE6之前的IE浏览器之外的所有浏览器上都是正确的。但在IE5这样的浏览器上，它的全宽仍是100点。可以用以前人发明的Box调整方法来处理这种差异。
+但用CSS也可以达到同样的目的，让它们显示效果一致。
+#box { width: 150px } #box div { border: 5px; padding: 20px }
+这样调用：
+<div id=”box”><div>…</div></div>
+这样，不管什么浏览器，宽度都是150点了。
+7、块元素居中对齐
+如果想做个固定宽度的网页并且想让网页水平居中的话，通常是这样：
+#content { width: 700px; margin: 0 auto }
+你会使用 <div id=”content”> 来围上所有元素。这很简单，但不够好，IE6之前版本会显示不出这种效果。改CSS如下：
+body { text-align: center } #content { text-align: left; width: 700px; margin: 0 auto }
+这会把网页内容都居中，所以在Content中又加入了
+text-align: left 。
+8、用CSS来处理垂直对齐
+垂直对齐用表格可以很方便地实现，设定表格单元 vertical-align: middle 就可以了。但对CSS来说这没用。如果你想设定一个导航条是2em高，而想让导航文字垂直居中的话，设定这个属性是没用的。
+CSS方法是什么呢？对了，把这些文字的行高设为 2em：line-height: 2em ，这就可以了。
+9、CSS在容器内定位
+CSS的一个好处是可以把一个元素任意定位，在一个容器内也可以。比如对这个容器：
+#container { position: relative }
+这样容器内所有的元素都会相对定位，可以这样用：
+<div id=”container”><div id=”navigation”>…</div></div>
+如果想定位到距左30点，距上5点，可以这样：
+#navigation { position: absolute; left: 30px; top: 5px }
+当然，你还可以这样：
+margin: 5px 0 0 30px
+注意4个数字的顺序是：上、右、下、左。当然，有时候定位的方法而不是边距的方法更好些。
+10、直通到屏幕底部的背景色
+在垂直方向是进行控制是CSS所不能的。如果你想让导航栏和内容栏一样直通到页面底部，用表格是很方便的，但如果只用这样的CSS：
+#navigation { background: blue; width: 150px }
+较短的导航条是不会直通到底部的，半路内容结束时它就结束了。该怎么办呢？
+不幸的是，只能采用欺骗的手段了，给这较短的一栏加上个背景图，宽度和栏宽一样，并让它的颜色和设定的背景色一样。
+body { background: url(/blog/blue-image.gif) 0 0 repeat-y }
+此时不能用em做单位，因为那样的话，一旦读者改变了字体大小，这个花招就会露馅，只能使用px。
