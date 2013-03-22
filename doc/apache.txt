@@ -1,0 +1,36 @@
+apache多个网站配置，有两种方法：
+1.基于多个端口
+
+===========================
+2.基于多个域名
+NameVirtualHost ，配置基于域名是必须配置的指令之一；
+
+===========================
+3.配置指令
+
+Directory： 用于封装一组指令，使之仅对某个目录及其子目录生效。
+示例：
+<Directory />
+
+AllowOverride None
+
+</Directory>
+
+
+VirtualHost :用于封装一组仅作用于特定虚拟主机的指令。任何在虚拟主机配置中可以使用的指令也同样可以在这里使用。
+示例：	
+
+<VirtualHost 10.1.2.3>
+
+ServerAdmin webmaster@host.foo.com
+DocumentRoot /www/docs/host.foo.com
+ServerName host.foo.com
+ErrorLog logs/host.foo.com-error_log
+TransferLog logs/host.foo.com-access_log
+
+</VirtualHost> 
+可配的参数有：
+虚拟主机的IP地址 
+虚拟主机IP地址对应的完整域名 
+字符"*"，仅与"NameVirtualHost *"配合使用以匹配所有的IP地址 
+字符串"_default_"，与基于IP的虚拟主机联用以捕获所有没有匹配的IP地址 

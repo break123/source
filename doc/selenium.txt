@@ -1,0 +1,7 @@
+1. firefox安装
+安装 Selenium Expert (Selenium IDE) 和 Selenium IDE Button（可选）  下载地址 ：http://docs.seleniumhq.org/download/
+
+2.命令
+clickAndWait 元素选择器（id=***） 点击并等待
+show_edit_btn
+
