@@ -1,2 +1,8 @@
 1. dojo
 dojo--是一个用javascript语言实现的开源DHTML工具包。它是在几个项目捐助基础上建立起来的(nWidgets,Burstlib,f(m)),这也是为什么叫它a"unified"toolkit的原因。Dojo的目标是解决开发DHTML应用程序遇到的那些，长期存在、历史问题。historicalproblemswithDHTML跨浏览器问题。 
+
+2.redis -一个类似memcache的key-value数据库。
+	http://redis.io/
+参考：http://www.php100.com/html/webkaifa/PHP/PHPyingyong/2011/0406/7873.html
+3. firefox 插件开发 
+4.github.com 程序开发
