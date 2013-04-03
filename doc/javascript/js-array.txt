@@ -1,0 +1,21 @@
+数据类型：
+
+    Numbers
+    Strings
+    Booleans
+    Objects
+    null
+    undefined
+
+    Functions
+    Arrays
+    RegExps  实际上都是属于Object
+创建数组：
+new Array();
+new Array(size);
+new Array(element0, element1, ..., elementn);
+var a=[];
+var b=['aa','bb','cc'];	
+var c=Array(); 和没有new是完全一样的；
+c.push(1); 增加数组大小
+c.pop(); 减小数组大小
