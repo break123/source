@@ -1,0 +1,5 @@
+主机 cpu ：inter i7 3000 
+guest os ubuntu 12
+错误：
+The cpu has been disabled by the guest operating system 
+所有办法都不行 ，换了freebsD系统可以。
