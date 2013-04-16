@@ -6,3 +6,4 @@ dojo--ÊÇÒ»¸öÓÃjavascriptÓïÑÔÊµÏÖµÄ¿ªÔ´DHTML¹¤¾ß°ü¡£ËüÊÇÔÚ¼¸¸öÏîÄ¿¾èÖú»ù´¡ÉÏ½¨Á¢Æ
 ²Î¿¼£ºhttp://www.php100.com/html/webkaifa/PHP/PHPyingyong/2011/0406/7873.html
 3. firefox ²å¼ş¿ª·¢ 
 4.github.com ³ÌĞò¿ª·¢
+5.ËÑË÷ÒıÇæ-google
