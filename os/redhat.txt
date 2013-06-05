@@ -1,0 +1,29 @@
+1.开启sshd
+修改服务器端配置文件（vim /etc/ssh/sshd_config）
+a、将验证方式改为“密码验证”；PasswordAuthentication yes
+b、重启 ssh服务；service sshd restart
+客户端登录（ssh root@192.168.0.21）
+======
+2. wget下载文件，目录到当前目录
+
+3.tcpdump 命令
+http://www.cnblogs.com/ggjucheng/archive/2012/01/14/2322659.html
+
+
+====================
+ps -aux  查看所有进程 
+netstat -anp
+查看服务器侦听情况，使用：netstat -an | grep LISTEN
+
+查看服务器已建立的连接，使用：netstat -an | grep ESTABLISHED
+查看内核
+
+4. vsftp:
+错误 ：
+目录权限设为755
+msg：553 Could not create file
+（没有权限）
+目录权限设为777
+msg：500 OOPS: vsftpd: refusing to run with writable anonymous root
+（安全原因，ftp用户不能有上传权限，神奇哦~~~！！）
+致死至终 ，还是没能上传

@@ -1,0 +1,71 @@
+uname -a 查看系统信息
+
+1.root 用户切换（远程）：
+需要修改/etc/group ,将该用户添加到wheel组。
+例如： 
+vi /etc/group
+wheel:*:0:root,vincent
+
+2.开启ftp服务
+系统自带的vsftp:
+使用 inetd 的方式启动 FTP 服务器。编辑 /etc/inetd.conf，将 ftp 设定开头的 # 移除：
+
+#ee /etc/inetd.conf
+
+ftp stream tcp nowait root /usr/libexec/ftpd ftpd -l
+
+ftp stream tcp6 nowait root /usr/libexec/ftpd ftpd -l
+
+然后在 /etc/rc.conf 中加入:
+
+#ee /etc/rc.conf
+
+inetd_enable="YES"
+
+重启电脑FTP服务启动.
+
+使用命令查看打开的端口:netstat -an  （查看21端口）
+
+3.开启远程root连接
+
+编辑/etc/inetd.conf,去掉ssh前的#,保存退出. 
+编辑/etc/rc.conf,最后加入:sshd_enable="yes"即可 
+启动sshd服务：#/etc/rc.d/sshd start 
+#netstat -an 检查服务是否启动，22端口有无sshd服务监听。 
+编辑/etc/ssh/sshd_config,在末尾加上如下内容： 
+
+PermitRootLogin yes #允许root通过sshd登陆
+PermitEmptyPasswords no  #不允许空密码
+PasswordAuthentication yes 
+重新启动sshd服务:/etc/rc.d/sshd restart。
+
+4.配置网络
+ip 配置文件rc.conf：
+ifconfig_lnc0="DHCP" (lnc0网卡名，dhcp自动分配)
+ifconfig_lnc0="inet 192.168.200.255 netmask 255.255.255.0"
+defaultrouter="192.168.200.254"
+dns配置文件 resolv.conf：
+nameserver 192.168.200.254
+5.查看email：
+freebsd下用mail命令查看邮件内容: You have new mail
+先输入＃mail 命令，然后命令提示符会变成 $ ,这此输入邮件最左侧一列的邮件编号，就可以查看邮件的内容了.
+要再次查看邮件的列表， 可以使用 h 键.
+要发出新邮件， 可以使用 m， 后面接收件人的邮件地址
+在 mail 工具中， 可以用 ? 来显示帮助
+5.http 服务
+apache：
+错误：一直不能启动，错误信息：hostname nor servname provided, or not known: mod_unique_id: unable to find IPv4 address of "vincent"
+注释掉了mod_unique_id.so 终于启动
+/etc/rc.conf
+nginx：
+ports安装
+/usr/local/etc/nginx/nginx.conf  配置文件
+6.ports操作
+
+7.下载
+
+8.vmtools-虚拟文件共享-挂载光盘驱动器
+安装 compat6x
+升级ports
+软件管理和ports更新比较麻烦啊 
+
